@@ -1,13 +1,19 @@
 public class SQLQuery {
 
+    String datbaseName;
+
+    public SQLQuery(String datbase){
+        datbaseName = datbase;
+    }
+
     /**
      *  return a string declare which typeXclone table it query oon
      * @param type number id of table, could be 1,2,3,123
      * @return String SQL query
      */
-    public String fromtypeXclones(int type){
-        // example: "from type1Clones;"
-        return " from type".concat(Integer.toString(type).concat("clones"));
+    private String fromtypeXclones(int type){
+        // example: "from ctags.type1Clones;"
+        return " from ".concat(datbaseName.concat(".type".concat(Integer.toString(type).concat("clones"))));
     }
 
     /**
@@ -46,7 +52,7 @@ public class SQLQuery {
      * @param type number id of table, could be 1,2,3,123
      * @return String SQL query
      */
-    public String getFileXInfo(String file, int type){
+    private String getFileXInfo(String file, int type){
         String selectQuery = "select revision, globalcloneid";
         String fromQuery = fromtypeXclones(type);
         // example: "where filepath = "hello.java" "
@@ -61,7 +67,7 @@ public class SQLQuery {
      * @param selectTableQuery a select sql query , could be result of getFileXInfo()
      * @return String SQL query
      */
-    public String selectChainIdFromFile(String selectTableQuery){
+    private String selectChainIdFromFile(String selectTableQuery){
         // the sql will first execute the selectTableQuery and store result as a table
         // a is the name of table generated above
         return "select distinct globalcloneid from (".concat(selectTableQuery.concat(") a ;"));
@@ -87,8 +93,7 @@ public class SQLQuery {
      * @param file name of file
      * @return String SQL query
      */
-    public String selectRevisionCloneidFromFileByChain(int type, int globalCloneId, String file){
-        //
+    private String selectRevisionCloneidFromFileByChain(int type, int globalCloneId, String file){
         return "Select revision, cloneid".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
     }
 
@@ -114,6 +119,31 @@ public class SQLQuery {
     public String selectMaxRevisionFromFileByChain(int type, int globalCloneId, String file){
         return "Select max(revision)".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
     }
+
+    /**
+     * return a string SQL query to select cloneid from a given table and a revision
+     * @param selectTableQuery a select sql query , could be result of selectRevisionCloneidFromFileByChain()
+     * @param revision number of start version of a clone chain
+     * @return String SQL query
+     */
+    private String selectCloneIdFromGlobalCloneId(String selectTableQuery, int revision){
+        return "Select cloneid from (".concat(selectTableQuery.concat(") a where revision = ".concat(Integer.toString(revision).concat(";"))));
+    }
+
+    /**
+     * return a string SQL query to select chain id from a table of a globalChainId and a revision
+     * globalChainId is base on filepath
+     * @param type number id of table, could be 1,2,3,123
+     * @param globalCloneId number if of clone chain
+     * @param file name of file
+     * @param revision number of start version of a clone chain
+     * @return String SQL query
+     */
+    public String selectCloneIdFromFromFileByChain(int type, int globalCloneId, String file,int revision){
+        String selectRevisionCloneidFromFileByChain = selectRevisionCloneidFromFileByChain(type, globalCloneId, file);
+        return selectCloneIdFromGlobalCloneId(selectRevisionCloneidFromFileByChain.substring(0,selectRevisionCloneidFromFileByChain.length()-1),revision);
+    }
+
 
 
 }
