@@ -69,14 +69,37 @@ public class SQLQuery {
 
     /**
      * return a string SQL query to select distinct globalcloneid(chain_id of a evolution chain) from a given table
-     * @param type
-     * @param globalCloneId
-     * @param file
-     * @return
+     * @param type number id of table, could be 1,2,3,123
+     * @param globalCloneId number if of clone chain
+     * @param file name of file
+     * @return String SQL query
      */
     public String selectRevisionCloneidFromFileByChain(int type, int globalCloneId, String file){
         //
         return "Select revision, cloneid".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
+    }
+
+    /**
+     * return a string SQL query to select distinct globalcloneid(chain_id of a evolution chain) from a given table
+     * @param type number id of table, could be 1,2,3,123
+     * @param globalCloneId number if of clone chain
+     * @param file name of file
+     * @return String SQL query
+     */
+    public String selectMinRevisionFromFileByChain(int type, int globalCloneId, String file){
+        //
+        return "Select min(revision)".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
+    }
+
+    /**
+     * return a string SQL query to select distinct globalcloneid(chain_id of a evolution chain) from a given table
+     * @param type number id of table, could be 1,2,3,123
+     * @param globalCloneId number if of clone chain
+     * @param file name of file
+     * @return String SQL query
+     */
+    public String selectMaxRevisionFromFileByChain(int type, int globalCloneId, String file){
+        return "Select max(revision)".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
     }
 
     public static void main(String[] args) {
