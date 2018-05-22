@@ -64,8 +64,8 @@ public class MySQLJDBC {
     }
 
     public static void main(String[] args) {
-        MySQLJDBC some = new MySQLJDBC();
-        System.out.println(some.doExecutionWithReturn("select * from clones_ctags.changes where revision = 15"));
+        //MySQLJDBC some = new MySQLJDBC();
+        //System.out.println(some.doExecutionWithReturn("select * from clones_ctags.changes where revision = 15"));
         /*
         JSONObject jo1 = new JSONObject();
         jo1.accumulate("name",0);
@@ -78,6 +78,8 @@ public class MySQLJDBC {
         js.accumulate("children",ja);
         System.out.println(js.toString());
         */
+        String some = "hwoo";
+        System.out.println(some.substring(0,some.length()-1));
 
     }
 }

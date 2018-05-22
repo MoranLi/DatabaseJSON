@@ -41,8 +41,8 @@ public class SQLQuery {
     }
 
     /**
-     * return a string SQL query to select maximum revision from typeXclone table
-     * X refers to a number
+     * return a string SQL query to select all file information base on filepath from typeXclone table
+     * @param file filepath of file
      * @param type number id of table, could be 1,2,3,123
      * @return String SQL query
      */
@@ -64,7 +64,20 @@ public class SQLQuery {
     public String selectChainIdFromFile(String selectTableQuery){
         // the sql will first execute the selectTableQuery and store result as a table
         // a is the name of table generated above
-        return "select distinct globalcloneid from (".concat(selectTableQuery.concat(") a"));
+        return "select distinct globalcloneid from (".concat(selectTableQuery.concat(") a ;"));
+    }
+
+
+    /**
+     * return a string SQL query to select distinct globalcloneid(chain_id of a evolution chain) from a table of a file
+     * file is base on filepath from typeXclone table
+     * @param file filepath of file
+     * @param type number id of table, could be 1,2,3,123
+     * @return String SQL query
+     */
+    public String selectChainIdFromGivenFile(String file, int type){
+        String getFileinfo = getFileXInfo(file,type);
+        return selectChainIdFromFile(getFileinfo.substring(0,getFileinfo.length()-1));
     }
 
     /**
@@ -102,7 +115,5 @@ public class SQLQuery {
         return "Select max(revision)".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
     }
 
-    public static void main(String[] args) {
 
-    }
 }
