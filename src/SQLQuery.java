@@ -3,7 +3,7 @@ public class SQLQuery {
     String datbaseName;
 
     public SQLQuery(String datbase){
-        datbaseName = datbase;
+        datbaseName = "clones_"+datbase;
     }
 
     /**
@@ -56,7 +56,7 @@ public class SQLQuery {
         String selectQuery = "select revision, globalcloneid";
         String fromQuery = fromtypeXclones(type);
         // example: "where filepath = "hello.java" "
-        String whereQuery = "where filepath = \"".concat(file.concat("\" "));
+        String whereQuery = " where filepath = \"".concat(file.concat("\" "));
         String orderQuery = "order by globalcloneid;";
         // return selectQuery + fromQuery + whereQuery + orderQuery
         return selectQuery.concat(fromQuery.concat(whereQuery.concat(orderQuery)));
@@ -94,7 +94,7 @@ public class SQLQuery {
      * @return String SQL query
      */
     private String selectRevisionCloneidFromFileByChain(int type, int globalCloneId, String file){
-        return "Select revision, cloneid".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
+        return "select revision, cloneid".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId).concat(" and filepath = \"".concat(file.concat("\" ;"))))));
     }
 
     /**
@@ -105,8 +105,7 @@ public class SQLQuery {
      * @return String SQL query
      */
     public String selectMinRevisionFromFileByChain(int type, int globalCloneId, String file){
-        //
-        return "Select min(revision)".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
+        return "select min(revision)".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId).concat(" and filepath = \"".concat(file.concat("\" ;"))))));
     }
 
     /**
@@ -117,7 +116,7 @@ public class SQLQuery {
      * @return String SQL query
      */
     public String selectMaxRevisionFromFileByChain(int type, int globalCloneId, String file){
-        return "Select max(revision)".concat(fromtypeXclones(type).concat("where globalcloneid = ".concat(Integer.toString(globalCloneId).concat("and filepath = \"".concat(file.concat("\" ;"))))));
+        return "select max(revision)".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId).concat(" and filepath = \"".concat(file.concat("\" ;"))))));
     }
 
     /**
@@ -127,7 +126,7 @@ public class SQLQuery {
      * @return String SQL query
      */
     private String selectCloneIdFromGlobalCloneId(String selectTableQuery, int revision){
-        return "Select cloneid from (".concat(selectTableQuery.concat(") a where revision = ".concat(Integer.toString(revision).concat(";"))));
+        return "select cloneid from (".concat(selectTableQuery.concat(") a where revision = ".concat(Integer.toString(revision).concat(";"))));
     }
 
     /**
@@ -144,6 +143,16 @@ public class SQLQuery {
         return selectCloneIdFromGlobalCloneId(selectRevisionCloneidFromFileByChain.substring(0,selectRevisionCloneidFromFileByChain.length()-1),revision);
     }
 
+    public static void main(String[] args) {
+        SQLQuery sq = new SQLQuery("ctags");
+        System.out.println(sq.selectAllfiles(1));
+        System.out.println(sq.selectMaxRevision(1));
+        System.out.println(sq.selectMinRevision(1));
+        System.out.println(sq.selectChainIdFromGivenFile("asp.c",1));
+        System.out.println(sq.selectMaxRevisionFromFileByChain(1,1,"asp.c"));
+        System.out.println(sq.selectMinRevisionFromFileByChain(1,1,"asp.c"));
+        System.out.println(sq.selectCloneIdFromFromFileByChain(1,1,"asp.c",1));
+    }
 
 
 }
