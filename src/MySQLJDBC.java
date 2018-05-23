@@ -1,7 +1,6 @@
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by yul04 on 2017/9/19.
@@ -27,12 +26,7 @@ public class MySQLJDBC {
         System.out.println("Connection done");
     }
 
-    private String doExecutionWithReturn(String input){
-        boolean returned = false;
-        String in = input.substring(0,6);
-        if("SELECT".equals(in)||"select".equals(in)) {
-            returned = true;
-        }
+    public String doExecutionWithReturn(String input){
         try{
             p = conn.prepareStatement(input);
             temp = p.executeQuery();
@@ -41,6 +35,47 @@ public class MySQLJDBC {
             e.printStackTrace();
         }
         return printResultSet();
+    }
+
+    public List doExecutionWithReturn2(String input){
+        try{
+            p = conn.prepareStatement(input);
+            temp = p.executeQuery();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return generateBiListByResultSet();
+    }
+
+    public List generateBiListByResultSet(){
+        try{
+            List biList = new ArrayList();
+            ResultSetMetaData rsmd = temp.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            // when there is only one column of data
+            // means is a version number / file list / clone chain list
+            if(columnsNumber == 1){
+                while(temp.next()){
+                    biList.add(temp.getString(1));
+                }
+                return biList;
+            }
+            else {
+                while(temp.next()){
+                    List childList = new ArrayList();
+                    for (int i = 1; i <= columnsNumber; i++) {
+                        String columnValue = temp.getString(i);
+                        childList.add(columnValue);
+                    }
+                    biList.add(childList);
+                }
+                return biList;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private String printResultSet(){
@@ -55,6 +90,7 @@ public class MySQLJDBC {
                     String columnValue = temp.getString(i);
                     result+=(columnValue + " " + rsmd.getColumnName(i)+"\n");
                 }
+                result+="\n hehehehe \n";
             }
         }
         catch (SQLException e){
@@ -64,23 +100,8 @@ public class MySQLJDBC {
     }
 
     public static void main(String[] args) {
-        //MySQLJDBC some = new MySQLJDBC();
-        //System.out.println(some.doExecutionWithReturn("select * from clones_ctags.changes where revision = 15"));
-        /*
-        JSONObject jo1 = new JSONObject();
-        jo1.accumulate("name",0);
-        jo1.accumulate("chain_key",0);
-        jo1.accumulate("children",new JSONArray());
-        JSONArray ja = new JSONArray();
-        ja.add(jo1);
-        JSONObject js = new JSONObject();
-        js.accumulate("name","hello world.java");
-        js.accumulate("children",ja);
-        System.out.println(js.toString());
-        */
-        String some = "hwoo";
-        System.out.println(some.substring(0,some.length()-1));
-
+        MySQLJDBC some = new MySQLJDBC();
+        System.out.println(some.doExecutionWithReturn2("select * from clones_ctags.changes where revision = 15"));
     }
 }
 

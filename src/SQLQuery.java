@@ -1,5 +1,6 @@
 public class SQLQuery {
 
+    // name of database
     String datbaseName;
 
     public SQLQuery(String datbase){
