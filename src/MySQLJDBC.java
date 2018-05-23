@@ -26,18 +26,7 @@ public class MySQLJDBC {
         System.out.println("Connection done");
     }
 
-    public String doExecutionWithReturn(String input){
-        try{
-            p = conn.prepareStatement(input);
-            temp = p.executeQuery();
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-        return printResultSet();
-    }
-
-    public List doExecutionWithReturn2(String input){
+    public List doExecutionWithReturn(String input){
         try{
             p = conn.prepareStatement(input);
             temp = p.executeQuery();
@@ -78,6 +67,19 @@ public class MySQLJDBC {
         return null;
     }
 
+    /*
+
+    public String doExecutionWithReturn(String input){
+        try{
+            p = conn.prepareStatement(input);
+            temp = p.executeQuery();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return printResultSet();
+    }
+
     private String printResultSet(){
         String result = "";
         try {
@@ -98,10 +100,11 @@ public class MySQLJDBC {
         }
         return result;
     }
+    */
 
     public static void main(String[] args) {
         MySQLJDBC some = new MySQLJDBC();
-        System.out.println(some.doExecutionWithReturn2("select * from clones_ctags.changes where revision = 15"));
+        System.out.println(some.doExecutionWithReturn("select * from clones_ctags.changes where revision = 15"));
     }
 }
 
