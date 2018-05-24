@@ -19,4 +19,9 @@ public class JsonData {
     public void setChildren(List children) {
         this.children = children;
     }
+
+    public String toString(){
+        return name;
+    }
+
 }
