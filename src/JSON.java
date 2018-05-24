@@ -1,8 +1,9 @@
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-public class JSON {
+import java.util.List;
 
+public class JSON {
 
 
     public static void main(String[] args) {
@@ -12,6 +13,7 @@ public class JSON {
         jo1.accumulate("children",new JSONArray());
         JSONArray ja = new JSONArray();
         ja.add(jo1);
+        ja.add("0");
         JSONObject js = new JSONObject();
         js.accumulate("name","hello world.java");
         js.accumulate("children",ja);
