@@ -3,13 +3,13 @@ import net.sf.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class SqlDataToJson {
-
-    public void writeToFile(String text){
-        try (PrintWriter out = new PrintWriter("filename.txt")) {
+public class SqlDataToJsonTwo {
+    public void writeToFile(String name, String text){
+        try (PrintWriter out = new PrintWriter("D://"+name+".json")) {
             out.println(text);
             out.close();
         } catch (FileNotFoundException e){
@@ -18,14 +18,10 @@ public class SqlDataToJson {
     }
 
     public void generateJsonFile (String databaseName) {
-
-    }
-
-    public static void main(String[] args) {
         // create daatbase connection
-        MySQLJDBC database = new MySQLJDBC();
+        MySQLJDBCTwo database = new MySQLJDBCTwo();
         // create query instance, testing schema clones_camellia(smallest)
-        SQLQuery sq = new SQLQuery("camellia");
+        SQLQuery sq = new SQLQuery(databaseName);
         // whole collection
         // contain 3 child, refers to type 1,2,3 clone
         JSONArray evolutionList = new JSONArray();
@@ -40,16 +36,16 @@ public class SqlDataToJson {
             JSONObject filesObject = new JSONObject();
             filesObject.accumulate("name",Integer.toString(i));
             // get all file name in type i clone
-            List fileList = database.doExecutionWithReturn(sq.selectAllfiles(i));
+            HashMap fileList = database.doExecutionWithReturn(sq.selectAllfiles(i));
             for(int j=0;j<fileList.size();j++){
                 // get specific file name
                 String fileName = (String)fileList.get(j);
-               // collection for all clone chain in a file
+                // collection for all clone chain in a file
                 JSONArray cloneChainsList = new JSONArray();
                 JSONObject cloneChainsObject = new JSONObject();
                 cloneChainsObject.accumulate("name",fileName);
                 // get all clone chain id in file j
-                List cloneChainsInFileX = database.doExecutionWithReturn(sq.selectChainIdFromGivenFile(fileName,i));
+                HashMap cloneChainsInFileX = database.doExecutionWithReturn(sq.getFileXInfo(fileName,i));
                 for(int k=0;k<cloneChainsInFileX.size();k++){
                     // get specific clone chain id
                     Integer cloneChainId = Integer.parseInt((String)cloneChainsInFileX.get(k));
@@ -64,17 +60,19 @@ public class SqlDataToJson {
                     JSONArray revisionList = new JSONArray();
                     JSONObject revisionObject = new JSONObject();
                     revisionObject.accumulate("name",cloneChainId.toString());
+                    HashMap combinationOfRevisionCloneId = database.doExecutionWithReturn(sq.selectRevisionCloneidFromFileByChain(i,cloneChainId,fileName));
                     // loop through all revision form first revision of system to end revision of chain
                     for(int m=minRevision;m<endRevisionOfChain+1;m++){
+                        JSONObject oneRevisionObject = new JSONObject();
                         // use -999 represent currently this chain do not exist
                         if(m<startRevisionOfChain){
-                            revisionList.add("-999");
+                            oneRevisionObject.accumulate("name","-999");
                         }
                         // of chain exist, store its pcid
                         else{
-                            String cloneid = (String)database.doExecutionWithReturn(sq.selectCloneIdFromFromFileByChain(i,cloneChainId,fileName,m)).get(0);
-                            revisionList.add(cloneid);
+                            oneRevisionObject.accumulate("name",combinationOfRevisionCloneId.get(m));
                         }
+                        revisionList.add(oneRevisionObject);
                     }
                     revisionObject.accumulate("children",revisionList);
                     cloneChainsList.add(revisionObject);
@@ -87,6 +85,12 @@ public class SqlDataToJson {
 
         }
         evolutionListObject.accumulate("children",evolutionList);
-
+        writeToFile(databaseName,evolutionListObject.toString());
     }
+
+    public static void main(String[] args) {
+        SqlDataToJsonTwo sdtt = new SqlDataToJsonTwo();
+        sdtt.generateJsonFile("camellia");
+    }
+
 }
