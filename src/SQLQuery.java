@@ -139,8 +139,7 @@ public class SQLQuery {
      * @return String SQL query
      */
     public String selectCloneIdFromFromFileByChain(int type, int globalCloneId, String file,int revision){
-        String selectRevisionCloneidFromFileByChain = selectRevisionCloneidFromFileByChain(type, globalCloneId, file);
-        return selectCloneIdFromGlobalCloneId(selectRevisionCloneidFromFileByChain.substring(0,selectRevisionCloneidFromFileByChain.length()-1),revision);
+        return "select cloneid".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId).concat(" and filepath = \"".concat(file.concat("\" and revision = ".concat(Integer.toString(revision).concat(" ;"))))))));
     }
 
     public static void main(String[] args) {

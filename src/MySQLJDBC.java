@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MySQLJDBCTwo {
+public class MySQLJDBC {
 
     Connection conn;
 
@@ -11,7 +11,10 @@ public class MySQLJDBCTwo {
 
     ResultSet temp;
 
-    public MySQLJDBCTwo(){
+    /**
+     * constructor try to connected to default database, initialize global var conn
+     */
+    public MySQLJDBC(){
         try {
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager
@@ -25,6 +28,11 @@ public class MySQLJDBCTwo {
         System.out.println("Connection done");
     }
 
+    /**
+     *  execute a sql query
+     * @param input sql query string
+     * @return hashmap from generated result set
+     */
     public HashMap<Integer,String> doExecutionWithReturn(String input){
         try{
             p = conn.prepareStatement(input);
@@ -36,6 +44,10 @@ public class MySQLJDBCTwo {
         return generateBiListByResultSet();
     }
 
+    /**
+     *  generate hash map from result set
+     * @return hashmap represent sqery result
+     */
     public HashMap<Integer,String> generateBiListByResultSet(){
         try{
             HashMap<Integer,String> map = new HashMap<>();
@@ -44,6 +56,7 @@ public class MySQLJDBCTwo {
             // when there is only one column of data
             // means is a version number / file list / clone chain list
             if(columnsNumber == 1){
+                // use int key strart from 0 to easily looping
                 int i = 0;
                 while(temp.next()){
                     map.put(i,temp.getString(1));
@@ -54,6 +67,7 @@ public class MySQLJDBCTwo {
             else {
                 // only one situation
                 // first field is revision, second is cloneid
+                // in future will use revision to search cloneid
                 while(temp.next()){
                     map.put(temp.getInt(1),temp.getString(2));
                 }

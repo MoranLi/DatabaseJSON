@@ -4,10 +4,13 @@ import net.sf.json.JSONObject;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class SqlDataToJsonTwo {
+public class SqlDataToJson {
+    /**
+     *  write generated json string to file
+     * @param name name of generated json file
+     * @param text string of json
+     */
     public void writeToFile(String name, String text){
         try (PrintWriter out = new PrintWriter("D://"+name+".json")) {
             out.println(text);
@@ -17,16 +20,20 @@ public class SqlDataToJsonTwo {
         }
     }
 
+    /**
+     *  main function perform system logic to generate a json file base on user input
+     * @param databaseName name of database choose
+     */
     public void generateJsonFile (String databaseName) {
         // create daatbase connection
-        MySQLJDBCTwo database = new MySQLJDBCTwo();
+        MySQLJDBC database = new MySQLJDBC();
         // create query instance, testing schema clones_camellia(smallest)
         SQLQuery sq = new SQLQuery(databaseName);
         // whole collection
         // contain 3 child, refers to type 1,2,3 clone
         JSONArray evolutionList = new JSONArray();
         JSONObject evolutionListObject = new JSONObject();
-        evolutionListObject.accumulate("name","camellia");
+        evolutionListObject.accumulate("name",databaseName);
         // i = 1/2/3 means type 1/2/3 clones
         for(int i=1;i<4;i++){
             // get minimum revision of current system in type i clone
@@ -89,8 +96,8 @@ public class SqlDataToJsonTwo {
     }
 
     public static void main(String[] args) {
-        SqlDataToJsonTwo sdtt = new SqlDataToJsonTwo();
-        sdtt.generateJsonFile("camellia");
+        SqlDataToJson sdtt = new SqlDataToJson();
+        sdtt.generateJsonFile("carol");
     }
 
 }
