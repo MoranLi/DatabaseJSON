@@ -33,7 +33,7 @@ public class MySQLJDBC {
      * @param input sql query string
      * @return hashmap from generated result set
      */
-    public HashMap<Integer,String> doExecutionWithReturn(String input){
+    public HashMap<Integer,String> doExecutionWithReturnJSON(String input){
         try{
             p = conn.prepareStatement(input);
             temp = p.executeQuery();
@@ -42,6 +42,22 @@ public class MySQLJDBC {
             e.printStackTrace();
         }
         return generateBiListByResultSet();
+    }
+
+    /**
+     *  execute a sql query
+     * @param input sql query string
+     * @return string from generated result set
+     */
+    public String doExecutionWithReturnCSV(String input){
+        try{
+            p = conn.prepareStatement(input);
+            temp = p.executeQuery();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return generateCSVStringByResultSet();
     }
 
     /**
@@ -77,6 +93,25 @@ public class MySQLJDBC {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String generateCSVStringByResultSet(){
+        String result = "";
+        try {
+            ResultSetMetaData rsmd = temp.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            while (temp.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+                    String columnValue = temp.getString(i);
+                    result+=(columnValue +",");
+                }
+                result+="\n";
+            }
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

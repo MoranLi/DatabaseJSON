@@ -142,6 +142,45 @@ public class SQLQuery {
         return "select cloneid".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId).concat(" and filepath = \"".concat(file.concat("\" and revision = ".concat(Integer.toString(revision).concat(" ;"))))))));
     }
 
+
+    /**
+     *  return a string SQL query to select distinct clone chain id from a typeXClone
+     * @param type number id of table, could be 1, 2, 3, 123
+     * @return String SQL query
+     */
+    public String selectChainId(int type){
+        return "select distinct globalcloneid".concat(fromtypeXclones(type));
+    }
+
+    /**
+     *  return a string SQL query to select distinct revision from a typeXClone
+     * @param type number id of table, could be 1, 2, 3, 123
+     * @return String SQL query
+     */
+    public String selectRevision(int type){
+        return "select distinct revision".concat(fromtypeXclones(type));
+    }
+
+    /**
+     * return a string SQL query to select max revision of a chain base on globalcloneid(chain_id of a evolution chain) from a given table
+     * @param type number id of table, could be 1,2,3,123
+     * @param globalCloneId number if of clone chain
+     * @return String SQL query
+     */
+    public String selectMaxRevisionByChain(int type, int globalCloneId){
+        return "select max(revision)".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId))));
+    }
+
+    /**
+     * return a string SQL query to select distinct globalcloneid(chain_id of a evolution chain) from a given table
+     * @param type number id of table, could be 1,2,3,123
+     * @param globalCloneId number if of clone chain
+     * @return String SQL query
+     */
+    public String selectRevisionChangecountByChain(int type, int globalCloneId){
+        return "select revision, changecount".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId))));
+    }
+
     public static void main(String[] args) {
         SQLQuery sq = new SQLQuery("ctags");
         System.out.println(sq.selectAllfiles(1));
@@ -151,6 +190,10 @@ public class SQLQuery {
         System.out.println(sq.selectMaxRevisionFromFileByChain(1,1,"asp.c"));
         System.out.println(sq.selectMinRevisionFromFileByChain(1,1,"asp.c"));
         System.out.println(sq.selectCloneIdFromFromFileByChain(1,1,"asp.c",1));
+        System.out.println(sq.selectChainId(1));
+        System.out.println(sq.selectRevision(1));
+        System.out.println(sq.selectMaxRevisionByChain(1,1));
+        System.out.println(sq.selectRevisionChangecountByChain(1,1));
     }
 
 

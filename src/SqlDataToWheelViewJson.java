@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
-public class SqlDataToJson {
+public class SqlDataToWheelViewJson {
     /**
      *  write generated json string to file
      * @param name name of generated json file
@@ -37,13 +37,13 @@ public class SqlDataToJson {
         // i = 1/2/3 means type 1/2/3 clones
         for(int i=1;i<4;i++){
             // get minimum revision of current system in type i clone
-            int minRevision = Integer.parseInt((String)database.doExecutionWithReturn(sq.selectMinRevision(i)).get(0));
+            int minRevision = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMinRevision(i)).get(0));
             // collection of all files in type i clone
             JSONArray filesList = new JSONArray();
             JSONObject filesObject = new JSONObject();
             filesObject.accumulate("name",Integer.toString(i));
             // get all file name in type i clone
-            HashMap fileList = database.doExecutionWithReturn(sq.selectAllfiles(i));
+            HashMap fileList = database.doExecutionWithReturnJSON(sq.selectAllfiles(i));
             for(int j=0;j<fileList.size();j++){
                 // get specific file name
                 String fileName = (String)fileList.get(j);
@@ -52,7 +52,7 @@ public class SqlDataToJson {
                 JSONObject cloneChainsObject = new JSONObject();
                 cloneChainsObject.accumulate("name",fileName);
                 // get all clone chain id in file j
-                HashMap cloneChainsInFileX = database.doExecutionWithReturn(sq.getFileXInfo(fileName,i));
+                HashMap cloneChainsInFileX = database.doExecutionWithReturnJSON(sq.getFileXInfo(fileName,i));
                 for(int k=0;k<cloneChainsInFileX.size();k++){
                     // get specific clone chain id
                     Integer cloneChainId = Integer.parseInt((String)cloneChainsInFileX.get(k));
@@ -60,14 +60,14 @@ public class SqlDataToJson {
                     // not sure about meaning of using -1 in data, currently assume is illegal
                     if(cloneChainId == -1)continue;
                     // get start revision of chain k
-                    Integer startRevisionOfChain = Integer.parseInt((String)database.doExecutionWithReturn(sq.selectMinRevisionFromFileByChain(i,cloneChainId,fileName)).get(0));
+                    Integer startRevisionOfChain = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMinRevisionFromFileByChain(i,cloneChainId,fileName)).get(0));
                     // get end revision of chain k
                     // assuming each chain have only one end
-                    Integer endRevisionOfChain = Integer.parseInt((String)database.doExecutionWithReturn(sq.selectMaxRevisionFromFileByChain(i,cloneChainId,fileName)).get(0));
+                    Integer endRevisionOfChain = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMaxRevisionFromFileByChain(i,cloneChainId,fileName)).get(0));
                     JSONArray revisionList = new JSONArray();
                     JSONObject revisionObject = new JSONObject();
                     revisionObject.accumulate("name",cloneChainId.toString());
-                    HashMap combinationOfRevisionCloneId = database.doExecutionWithReturn(sq.selectRevisionCloneidFromFileByChain(i,cloneChainId,fileName));
+                    HashMap combinationOfRevisionCloneId = database.doExecutionWithReturnJSON(sq.selectRevisionCloneidFromFileByChain(i,cloneChainId,fileName));
                     // loop through all revision form first revision of system to end revision of chain
                     for(int m=minRevision;m<endRevisionOfChain+1;m++){
                         JSONObject oneRevisionObject = new JSONObject();
@@ -96,8 +96,8 @@ public class SqlDataToJson {
     }
 
     public static void main(String[] args) {
-        SqlDataToJson sdtt = new SqlDataToJson();
-        sdtt.generateJsonFile("carol");
+        SqlDataToWheelViewJson sdtt = new SqlDataToWheelViewJson();
+        sdtt.generateJsonFile("ctags");
     }
 
 }
