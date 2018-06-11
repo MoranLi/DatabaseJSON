@@ -25,36 +25,45 @@ public class SqlDataToPCJson {
      * @param databaseName name of database choose
      */
     public void generateJSONFile(String databaseName) {
-        // create daatbase connection
+        // create database connection
         MySQLJDBC database = new MySQLJDBC();
         // create query instance, testing schema clones_camellia(smallest)
         SQLQuery sq = new SQLQuery(databaseName);
         // whole collection
         // contain 3 child, refers to type 1,2,3 clone
         JSONArray evolutionList = new JSONArray();
+        // data description about whole system
+        JSONObject systemInfo = new JSONObject();
+        // get minimum revision of current system in type i clone
+        int minRevision = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMinSystemRevision()).get(0));
+        int maxRevision = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMaxSystemRevision()).get(0));
         // loop through three type of clone
         for(int i=1;i<4;i++){
-            // get minimum revision of current system in type i clone
-            int minRevision = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMinRevision(i)).get(0));
             HashMap cloneChainList = database.doExecutionWithReturnJSON(sq.selectChainId(i));
             for(int j=0;j<cloneChainList.size();j++){
                 Integer chainId = Integer.parseInt((String)cloneChainList.get(j));
                 if(chainId <= 0) continue;
                 HashMap revisionChangecountData = database.doExecutionWithReturnJSON(sq.selectRevisionChangecountByChain(i,chainId));
-                Integer endRevisionOfChain = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMaxRevisionByChain(i,chainId)).get(0));
+                int startRevsion = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMinRevisionByChain(i,chainId)).get(0));
+                int endRevsion = Integer.parseInt((String)database.doExecutionWithReturnJSON(sq.selectMaxRevisionByChain(i,chainId)).get(0));
                 JSONObject cloneChainsObject = new JSONObject();
-                for(int k = minRevision;k<=endRevisionOfChain;k++){
+                cloneChainsObject.accumulate("Name",chainId);
+                cloneChainsObject.accumulate("StartRevision",startRevsion);
+                cloneChainsObject.accumulate("EndRevision",endRevsion);
+                for(int k = minRevision;k<=maxRevision;k++){
                     try{
                         cloneChainsObject.accumulate(Integer.toString(k),Integer.parseInt((String)revisionChangecountData.get(k)));
                     } catch (Exception e){
-                        cloneChainsObject.accumulate(Integer.toString(k),0);
+                        cloneChainsObject.accumulate(Integer.toString(k),-1);
                     }
-                    //
                 }
                 evolutionList.add(cloneChainsObject);
             }
         }
-        writeToFile(databaseName,evolutionList.toString());
+        systemInfo.accumulate("clone_evolution",evolutionList);
+        systemInfo.accumulate("min_revsion",minRevision);
+        systemInfo.accumulate("max_revision",maxRevision);
+        writeToFile(databaseName,systemInfo.toString());
     }
 
     public static void main(String[] args) {

@@ -162,6 +162,16 @@ public class SQLQuery {
     }
 
     /**
+     * return a string SQL query to select min revision of a chain base on globalcloneid(chain_id of a evolution chain) from a given table
+     * @param type number id of table, could be 1,2,3,123
+     * @param globalCloneId number if of clone chain
+     * @return String SQL query
+     */
+    public String selectMinRevisionByChain(int type, int globalCloneId){
+        return "select min(revision)".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId))));
+    }
+
+    /**
      * return a string SQL query to select max revision of a chain base on globalcloneid(chain_id of a evolution chain) from a given table
      * @param type number id of table, could be 1,2,3,123
      * @param globalCloneId number if of clone chain
@@ -179,6 +189,22 @@ public class SQLQuery {
      */
     public String selectRevisionChangecountByChain(int type, int globalCloneId){
         return "select revision, changecount".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId))));
+    }
+
+    /**
+     * return a string SQL query to select min revision of system
+     * @return String SQL query
+     */
+    public String selectMinSystemRevision(){
+        return "select min(revision) from ".concat(datbaseName.concat(".methods"));
+    }
+
+    /**
+     * return a string SQL query to select max revision of system
+     * @return String SQL query
+     */
+    public String selectMaxSystemRevision(){
+        return "select max(revision) from ".concat(datbaseName.concat(".methods"));
     }
 
     public static void main(String[] args) {
