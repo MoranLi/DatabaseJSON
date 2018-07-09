@@ -187,8 +187,8 @@ public class SQLQuery {
      * @param globalCloneId number if of clone chain
      * @return String SQL query
      */
-    public String selectRevisionChangecountByChain(int type, int globalCloneId){
-        return "select revision, changecount".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId))));
+    public String selectRevisionChangecountStartEndCloneClassByChain(int type, int globalCloneId){
+        return "select revision, cloneid, changecount, startline, endline, cloneclass".concat(fromtypeXclones(type).concat(" where globalcloneid = ".concat(Integer.toString(globalCloneId))));
     }
 
     /**
@@ -207,6 +207,33 @@ public class SQLQuery {
         return "select max(revision) from ".concat(datbaseName.concat(".methods"));
     }
 
+    public String selectNumOfFile() {
+        return "select count(distinct filepath) from ".concat(datbaseName.concat(".methods"));
+    }
+
+    public String selectNumOfCloneChain() {
+        return "select count(distinct filepath) from ".concat(datbaseName.concat(".methods"));
+    }
+
+    public String selectNumOfClone() {
+        String t1 = "select count(distinct cloneid)".concat(fromtypeXclones(1));
+        String t2 = "select count(distinct cloneid)".concat(fromtypeXclones(2));
+        String t3 = "select count(distinct cloneid)".concat(fromtypeXclones(3));
+        return "select (".concat(t1).concat(") + (").concat(t2).concat(") + (").concat(t3).concat(");");
+    }
+
+    public String sumChangeCountOfCloneChain(int type, int chainId){
+        return "select sum(changecount)".concat(fromtypeXclones(type)).concat( " where globalcloneid = ").concat(Integer.toString(chainId)).concat(";");
+    }
+
+    public String selectFilepathOfCloneChain(int type, int chainId){
+        return "select distinct filepath ".concat(fromtypeXclones(type)).concat( " where globalcloneid = ").concat(Integer.toString(chainId)).concat(";");
+    }
+
+    public String selectRevisionChangeCountOfChain(int type, int chainId){
+        return "select revision, changecount".concat(fromtypeXclones(type)).concat( " where globalcloneid = ").concat(Integer.toString(chainId)).concat(";");
+    }
+
     public static void main(String[] args) {
         SQLQuery sq = new SQLQuery("ctags");
         System.out.println(sq.selectAllfiles(1));
@@ -219,7 +246,11 @@ public class SQLQuery {
         System.out.println(sq.selectChainId(1));
         System.out.println(sq.selectRevision(1));
         System.out.println(sq.selectMaxRevisionByChain(1,1));
-        System.out.println(sq.selectRevisionChangecountByChain(1,1));
+        System.out.println(sq.selectRevisionChangecountStartEndCloneClassByChain(1,1));
+        System.out.println(sq.selectNumOfFile());
+        System.out.println(sq.selectNumOfClone());
+        System.out.println(sq.sumChangeCountOfCloneChain(1,1));
+        System.out.println(sq.selectRevisionChangeCountOfChain(1,1));
     }
 
 

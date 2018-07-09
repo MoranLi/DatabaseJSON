@@ -18,7 +18,7 @@ public class MySQLJDBC {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager
-                    .getConnection("jdbc:mysql://i.sudo.gq:3306",
+                    .getConnection("jdbc:mysql://i.uhhuh.ga:3306",
                             "forclones", "123456");
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,17 +78,23 @@ public class MySQLJDBC {
                     map.put(i,temp.getString(1));
                     i++;
                 }
-                return map;
             }
-            else {
-                // only one situation
-                // first field is revision, second is cloneid
-                // in future will use revision to search cloneid
+            // when get changecount of another chain to compare chain similarity
+            else if (columnsNumber == 2){
                 while(temp.next()){
                     map.put(temp.getInt(1),temp.getString(2));
                 }
-                return map;
             }
+            else {
+                // only one situation
+                // first field is revision, second is changecount, third is start line, fourth is end line, fifth is clone class
+                // in future will use revision to search cloneid
+                while(temp.next()){
+                    // map.put(temp.getInt(1),temp.getString(2));
+                    map.put(temp.getInt(1),temp.getString(2).concat(":").concat(temp.getString(3)).concat(":").concat(temp.getString(4)).concat(":").concat(temp.getString(5)).concat(":").concat(temp.getString(6)));
+                }
+            }
+            return map;
         }catch (SQLException e){
             e.printStackTrace();
         }
